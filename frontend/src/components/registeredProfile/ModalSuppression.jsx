@@ -39,7 +39,7 @@ export default function FormDialog() {
     }
 
     axios
-      .delete(`http://localhost:5000/users/${userId}`, {
+      .delete(`http://localhost:4000/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

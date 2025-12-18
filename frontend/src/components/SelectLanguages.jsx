@@ -20,7 +20,7 @@ export default function SelectLanguage() {
 
   const getLanguages = () => {
     axios
-      .get("http://localhost:5000/languages", {
+      .get("http://localhost:4000/languages", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => response.data)

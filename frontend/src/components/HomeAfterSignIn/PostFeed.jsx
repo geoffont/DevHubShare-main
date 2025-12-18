@@ -19,13 +19,13 @@ export default function PostFeed({ languageNameSelected, languageSelected }) {
     const fetchData = async () => {
       try {
         const [answers, users, posts] = await Promise.all([
-          axios.get("http://localhost:5000/answers", {
+          axios.get("http://localhost:4000/answers", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:5000/users", {
+          axios.get("http://localhost:4000/users", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:5000/posts", {
+          axios.get("http://localhost:4000/posts", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -60,7 +60,7 @@ export default function PostFeed({ languageNameSelected, languageSelected }) {
   const handleUpdateAnswer = async (postId, answerId, updatedAnswerText) => {
     try {
       await axios.put(
-        `http://localhost:5000/answers/${answerId}`,
+        `http://localhost:4000/answers/${answerId}`,
         {
           user_id: localId,
           post_id: postId,

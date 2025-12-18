@@ -32,14 +32,14 @@ export default function FeedSelected() {
 
   useEffect(() => {
     const getAnswerList = async () => {
-      const response = await axios.get("http://localhost:5000/answers", {
+      const response = await axios.get("http://localhost:4000/answers", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAnswerList(response.data);
     };
 
     const getUserList = async () => {
-      const response = await axios.get("http://localhost:5000/users", {
+      const response = await axios.get("http://localhost:4000/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserList(response.data);
@@ -50,7 +50,7 @@ export default function FeedSelected() {
 
   useEffect(() => {
     const getLanguageList = async () => {
-      const response = await axios.get("http://localhost:5000/languages", {
+      const response = await axios.get("http://localhost:4000/languages", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLanguageList(response.data);
@@ -59,7 +59,7 @@ export default function FeedSelected() {
   }, []);
 
   const getPostList = async () => {
-    const response = await axios.get("http://localhost:5000/posts", {
+    const response = await axios.get("http://localhost:4000/posts", {
       headers: { Authorization: `Bearer ${token}` },
     });
     setPostList(response.data);

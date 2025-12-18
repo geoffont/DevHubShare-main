@@ -76,7 +76,7 @@ function RegisteredInformations() {
 
   const getLanguages = () => {
     axios
-      .get("http://localhost:5000/languages", {
+      .get("http://localhost:4000/languages", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => response.data)
@@ -91,7 +91,7 @@ function RegisteredInformations() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/users/${userId}`, {
+      .get(`http://localhost:4000/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -102,7 +102,7 @@ function RegisteredInformations() {
   useEffect(() => {
     if (currentUser && currentUser.id) {
       axios
-        .get(`http://localhost:5000/user_has_language/${userId}`, {
+        .get(`http://localhost:4000/user_has_language/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => response.data)
@@ -123,7 +123,7 @@ function RegisteredInformations() {
     };
     axios
       .put(
-        `http://localhost:5000/users/${userId}`,
+        `http://localhost:4000/users/${userId}`,
         { ...userUpdate, language_id, languageUpdate },
         {
           headers: { Authorization: `Bearer ${token}` },

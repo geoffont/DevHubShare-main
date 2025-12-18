@@ -33,7 +33,7 @@ export default function Sidebar() {
 
   const getLanguages = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/languages");
+      const { data } = await axios.get("http://localhost:4000/languages");
       setSideLanguages(data);
     } catch (error) {
       console.error(error);

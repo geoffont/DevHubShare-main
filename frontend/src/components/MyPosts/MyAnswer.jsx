@@ -27,7 +27,7 @@ export default function MyAnswer({ post, onNewAnswerSubmitted }) {
       const localId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:5000/answers",
+        "http://localhost:4000/answers",
         {
           answer_text: answerText,
           post_id: post.id,

@@ -20,7 +20,7 @@ function TexteLibre() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/users/${userIdSelected}`, {
+      .get(`http://localhost:4000/users/${userIdSelected}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

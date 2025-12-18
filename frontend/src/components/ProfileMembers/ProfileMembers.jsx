@@ -17,14 +17,14 @@ export default function ProfileMembers() {
 
   useEffect(() => {
     const getUsers = async () => {
-      const response = await axios.get("http://localhost:5000/users", {
+      const response = await axios.get("http://localhost:4000/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(response.data);
     };
     const getUsersHasLanguages = async () => {
       const response = await axios.get(
-        "http://localhost:5000/user_has_language",
+        "http://localhost:4000/user_has_language",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -38,7 +38,7 @@ export default function ProfileMembers() {
   useEffect(() => {
     const handleLanguage = async () => {
       const languageName = languageNameSelected;
-      const response = await axios.get("http://localhost:5000/languages", {
+      const response = await axios.get("http://localhost:4000/languages", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const allLanguages = response.data;

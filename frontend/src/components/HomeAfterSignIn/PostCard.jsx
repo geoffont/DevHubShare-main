@@ -57,7 +57,7 @@ export default function PostCard({
     event.preventDefault();
     try {
       await axios.post(
-        "http://localhost:5000/answers",
+        "http://localhost:4000/answers",
         {
           user_id: localId,
           post_id: postId,
@@ -78,7 +78,7 @@ export default function PostCard({
   const handleDeletePost = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/posts/${postId}`,
+        `http://localhost:4000/posts/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

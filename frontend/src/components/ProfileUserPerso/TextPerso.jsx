@@ -20,7 +20,7 @@ function TextPerso() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/users/${userId}`, {
+      .get(`http://localhost:4000/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

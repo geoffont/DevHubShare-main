@@ -26,7 +26,7 @@ export default function Conversation({ post, newAnswer, postIsDeleted }) {
     async function getMyAnswers() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/answers/post/${post.id}`,
+          `http://localhost:4000/answers/post/${post.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -48,7 +48,7 @@ export default function Conversation({ post, newAnswer, postIsDeleted }) {
   async function updateAnswer(answerId) {
     try {
       await axios.put(
-        `http://localhost:5000/answers/${answerId}`,
+        `http://localhost:4000/answers/${answerId}`,
         {
           answer_text: editedAnswerText,
           post_id: post.id,

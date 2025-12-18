@@ -23,7 +23,7 @@ export default function PostSent({
 
   const getMyPosts = () => {
     axios
-      .get(`http://localhost:5000/posts/user/${id}`, {
+      .get(`http://localhost:4000/posts/user/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => response.data)
@@ -46,7 +46,7 @@ export default function PostSent({
 
   const handleDeletePost = (postId) => {
     axios
-      .delete(`http://localhost:5000/posts/${postId}`, {
+      .delete(`http://localhost:4000/posts/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {

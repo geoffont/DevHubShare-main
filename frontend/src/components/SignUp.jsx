@@ -67,7 +67,7 @@ export default function SignUp() {
         language_id: languageId,
       };
 
-      axios.post("http://localhost:5000/users", newUser).then((response) => {
+      axios.post("http://localhost:4000/users", newUser).then((response) => {
         setUserData([...userData, response.data]);
         setLanguageId([]);
         formik.handleReset();
@@ -79,7 +79,7 @@ export default function SignUp() {
 
   const getLanguages = () => {
     axios
-      .get("http://localhost:5000/languages")
+      .get("http://localhost:4000/languages")
       .then((response) => response.data)
       .then((data) => {
         setSideLanguages(data);
@@ -91,7 +91,7 @@ export default function SignUp() {
   }, []);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/users").then((response) => {
+    axios.get("http://localhost:4000/users").then((response) => {
       setUserData(response.data);
     });
   }, []);

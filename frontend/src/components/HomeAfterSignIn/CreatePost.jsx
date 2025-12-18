@@ -42,7 +42,7 @@ export default function CreatePost({
   useEffect(() => {
     const getLanguages = () => {
       axios
-        .get("http://localhost:5000/languages", {
+        .get("http://localhost:4000/languages", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -75,7 +75,7 @@ export default function CreatePost({
     );
     axios
       .post(
-        "http://localhost:5000/posts",
+        "http://localhost:4000/posts",
         {
           user_id: userId,
           language_id: selectedLanguage.id,

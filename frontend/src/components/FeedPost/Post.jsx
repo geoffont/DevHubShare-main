@@ -46,7 +46,7 @@ export default function Post({
     event.preventDefault();
     try {
       await axios.post(
-        "http://localhost:5000/answers",
+        "http://localhost:4000/answers",
         {
           user_id: localId,
           post_id: postId,
