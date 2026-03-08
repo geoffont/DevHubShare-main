@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(npx prettier --write \"src/**/*.{jsx,js}\")",
-      "Bash(npx eslint --ext .jsx src/)"
+      "Bash(npx eslint --ext .jsx src/)",
+      "Bash(git add frontend/index.html frontend/src/assets/favicon.svg)",
+      "Bash(git commit:*)",
+      "Bash(git push origin main)"
     ]
   }
 }
