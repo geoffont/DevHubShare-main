@@ -1,3 +1,10 @@
+// Compatibility shim for Node.js v22+ (SlowBuffer was removed)
+const buffer = require("buffer");
+
+if (!buffer.SlowBuffer) {
+  buffer.SlowBuffer = Buffer;
+}
+
 require("dotenv").config();
 
 const app = require("./src/app");

@@ -22,41 +22,37 @@ import "./App.css";
 function App() {
   const [selectedLanguage, setSelectedLanguage] = useState();
   return (
-    <div className="App">
-      <SelectedLanguageContext.Provider
-        value={{
-          selectedLanguage,
-          setSelectedLanguage,
-        }}
-      >
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/inscription" element={<SignUpPage />} />
-          <Route path="/connexion" element={<SignInPage />} />
-          <Route path="/ressources" element={<Resources />} />
-          <Route path="/erreur404" element={<NotFoundPage />} />
-          <Route path="/erreur400" element={<BadRequestPage />} />
-          <Route element={<PrivateRoutes />}>
-            <Route path="/user-compte" element={<ProfileUserPage />} />
-            <Route path="/mon-compte" element={<ProfilePersoPage />} />
-            <Route path="/creer-post" element={<HomeAfterSignIn />} />
-            <Route
-              path="/creation-compte"
-              element={<ProfileUserRegistered />}
-            />
-            <Route path="/profil-membres" element={<ProfileMembersPage />} />
-            <Route
-              path="/profil-membre/:userIdSelected"
-              element={<ProfileUserPage />}
-            />
-            <Route path="/fil-de-discussion" element={<LanguageSelectFeed />} />
-            <Route path="/mes-posts" element={<MyPostsPage />} />
-          </Route>
-        </Routes>
-      </SelectedLanguageContext.Provider>
-    </div>
+    <SelectedLanguageContext.Provider
+      value={{
+        selectedLanguage,
+        setSelectedLanguage,
+      }}
+    >
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/inscription" element={<SignUpPage />} />
+        <Route path="/connexion" element={<SignInPage />} />
+        <Route path="/ressources" element={<Resources />} />
+        <Route path="/erreur404" element={<NotFoundPage />} />
+        <Route path="/erreur400" element={<BadRequestPage />} />
+        <Route element={<PrivateRoutes />}>
+          <Route path="/user-compte" element={<ProfileUserPage />} />
+          <Route path="/mon-compte" element={<ProfilePersoPage />} />
+          <Route path="/creer-post" element={<HomeAfterSignIn />} />
+          <Route path="/creation-compte" element={<ProfileUserRegistered />} />
+          <Route path="/profil-membres" element={<ProfileMembersPage />} />
+          <Route
+            path="/profil-membre/:userIdSelected"
+            element={<ProfileUserPage />}
+          />
+          <Route path="/fil-de-discussion" element={<LanguageSelectFeed />} />
+          <Route path="/mes-posts" element={<MyPostsPage />} />
+        </Route>
+      </Routes>
+    </SelectedLanguageContext.Provider>
   );
 }
+
 SelectedLanguageContext.Provider.propTypes = {
   value: PropTypes.shape({
     selectedLanguage: PropTypes.string,

@@ -1,10 +1,11 @@
 import React from "react";
+import Layout from "../components/Layout";
 import BadRequestError from "../components/BadRequestError";
 
 export default function BadRequestPage() {
   return (
-    <div>
+    <Layout>
       <BadRequestError />
-    </div>
+    </Layout>
   );
 }

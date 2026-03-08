@@ -1,36 +1,11 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Paper, TextField, Button } from "@material-ui/core";
-import UserImage from "../UserImage";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    background: "#009aa3",
-    padding: theme.spacing(2.5),
-    marginBottom: theme.spacing(1),
-  },
-  field: {
-    background: "#FFF",
-    borderRadius: 5,
-    paddingLeft: 5,
-    marginBottom: theme.spacing(1),
-  },
-  valider: {
-    display: "flex",
-    justifyContent: "flex-end",
-  },
-}));
+import { Box, Grid, TextField, Typography, Chip } from "@mui/material";
 
 function Informations() {
-  const [currentUser, setCurrentUser] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
   const [userLanguages, setUserLanguages] = useState([]);
-  const classes = useStyles();
-
-  const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
   const { userIdSelected } = useParams();
 
@@ -39,163 +14,91 @@ function Informations() {
       .get(`http://localhost:4000/users/${userIdSelected}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        setCurrentUser(response.data);
-      });
-  }, []);
+      .then((response) => setCurrentUser(response.data));
+  }, [userIdSelected]);
 
   useEffect(() => {
     axios
       .get(`http://localhost:4000/user_has_language/${userIdSelected}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => response.data)
-      .then((data) => {
-        const userLanguageObjects = data.map((lang) => ({
-          language_name: lang.language_name,
-        }));
-        setUserLanguages(userLanguageObjects);
+      .then((response) => {
+        setUserLanguages(
+          response.data.map((lang) => ({ language_name: lang.language_name }))
+        );
       });
   }, [userIdSelected]);
 
-  useEffect(() => {
-    const getUserClicked = async () => {
-      const response = await axios.get(
-        `http://localhost:4000/users/${userIdSelected}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setCurrentUser(response.data);
-    };
-    getUserClicked();
-  }, [userIdSelected]);
+  const fields = [
+    { label: "Pseudo", value: currentUser.pseudo },
+    { label: "Prénom", value: currentUser.firstname },
+    { label: "Nom", value: currentUser.lastname },
+    { label: "Email", value: currentUser.email },
+    { label: "Poste actuel", value: currentUser.workplace },
+    { label: "GitHub", value: currentUser.github },
+    { label: "LinkedIn", value: currentUser.linkedin },
+  ];
 
   return (
-    <Paper className={classes.root}>
-      <Button variant="contained" className={classes.retour} href="/creer-post">
-        Retour
-      </Button>
-      <div className={classes.userImageContainer}>
-        <UserImage size="5rem" backgroundColor="grey" />
-      </div>
-      <form className={classes.root} noValidate autoComplete="off">
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+    <Box
+      sx={{
+        backgroundColor: "#FFFFFF",
+        border: "1px solid #E2E8F0",
+        borderRadius: 3,
+        p: 3,
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{ fontWeight: 700, color: "#0F172A", mb: 2.5 }}
+      >
+        Informations
+      </Typography>
+      <Grid container spacing={2}>
+        {fields.map((f) => (
+          <Grid item xs={12} key={f.label}>
             <TextField
-              className={classes.field}
-              label="Pseudo"
-              value={`${currentUser.pseudo ? ` ${currentUser.pseudo}` : ""}`}
+              label={f.label}
+              value={f.value || ""}
               fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
+              size="small"
+              InputProps={{ readOnly: true }}
+              InputLabelProps={{ shrink: true }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#F8FAFC",
+                  "& fieldset": { borderColor: "#E2E8F0" },
+                },
               }}
             />
           </Grid>
+        ))}
+        {userLanguages.length > 0 && (
           <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Prénom"
-              value={`${
-                currentUser.firstname ? ` ${currentUser.firstname}` : ""
-              }`}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
+            <Typography
+              sx={{ fontSize: 12, fontWeight: 600, color: "#475569", mb: 1 }}
+            >
+              Langages
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+              {userLanguages.map((lang) => (
+                <Chip
+                  key={lang.language_name}
+                  label={lang.language_name}
+                  size="small"
+                  sx={{
+                    backgroundColor: "#EEF2FF",
+                    color: "#6366F1",
+                    fontWeight: 600,
+                    fontSize: 11,
+                  }}
+                />
+              ))}
+            </Box>
           </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Nom"
-              value={`${
-                currentUser.lastname ? ` ${currentUser.lastname}` : ""
-              }`}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Email"
-              value={`${currentUser.email ? ` ${currentUser.email}` : ""}`}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Poste Actuel"
-              value={`${
-                currentUser.workplace ? ` ${currentUser.workplace}` : ""
-              }`}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Git-Hub Page"
-              value={`${currentUser.github ? ` ${currentUser.github}` : ""}`}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Linkedin"
-              value={`${
-                currentUser.linkedin ? ` ${currentUser.linkedin}` : ""
-              }`}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              className={classes.field}
-              label="Langues"
-              value={userLanguages.map((lang) => lang.language_name).join(", ")}
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-                disableAnimation: true,
-                position: "top",
-              }}
-            />
-          </Grid>
-        </Grid>
-      </form>
-    </Paper>
+        )}
+      </Grid>
+    </Box>
   );
 }
 

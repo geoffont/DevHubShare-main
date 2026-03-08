@@ -1,83 +1,50 @@
-/* eslint-disable react/jsx-no-bind */
-import Divider from "@mui/material/Divider";
-import { Stack, useMediaQuery } from "@mui/material";
 import React, { useState } from "react";
+import { Box, Divider, useMediaQuery, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import PostSent from "./PostSent";
 import Conversation from "./Conversation";
 import MyAnswer from "./MyAnswer";
-import LinkButton from "./LinkButton";
-import UserImage from "../UserImage";
 
 export default function MyPosts() {
   const isMediumScreen = useMediaQuery("(max-width: 800px)");
-  const isSmallScreen = useMediaQuery("(max-width: 600px)");
   const [selectedPost, setSelectedPost] = useState({});
   const [sendAnswer, setSendAnswer] = useState({});
   const [isNewAnswerSubmitted, setIsNewAnswerSubmitted] = useState(false);
   const [postIsDeleted, setPostIsDeleted] = useState(false);
-
-  function handleSelectedPost(post) {
-    setSelectedPost(post);
-  }
-
-  function handleAnswer(post) {
-    setSendAnswer(post);
-  }
-
-  function handleNewAnswerSubmitted() {
-    setIsNewAnswerSubmitted(!isNewAnswerSubmitted);
-  }
-
-  function determineMinWidth() {
-    if (isMediumScreen) {
-      return "60vw";
-    }
-    if (isSmallScreen) {
-      return "96vw";
-    }
-    return "50%";
-  }
+  const navigate = useNavigate();
 
   return (
-    <Stack
-      direction={isMediumScreen ? "column" : "row"}
-      justifyContent="center"
-      paddingTop="1rem"
-      paddingLeft="5%"
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: isMediumScreen ? "column" : "row",
+        gap: 3,
+        alignItems: "flex-start",
+        mt: 2,
+      }}
     >
-      <Stack
-        direction="column"
-        sx={{
-          minWidth: determineMinWidth(isMediumScreen, isSmallScreen),
-        }}
-      >
-        <div className="imageAvatarPost" style={{ paddingBottom: "1rem" }}>
-          <UserImage size="5rem" backgroundColor="grey" />
-        </div>
+      <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
         <PostSent
-          onPostSelected={handleSelectedPost}
-          onSendAnswer={handleAnswer}
+          onPostSelected={setSelectedPost}
+          onSendAnswer={setSendAnswer}
           onPostDeleted={setPostIsDeleted}
         />
-      </Stack>
+      </Box>
+
       {isMediumScreen ? (
-        <Divider
-          orientation="horizontal"
-          flexItem
-          sx={{ marginTop: "1rem", marginBottom: "1rem" }}
-        />
+        <Divider flexItem />
       ) : (
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{ marginLeft: "1rem", marginRight: "1rem" }}
-        />
+        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
       )}
-      <Stack
-        direction="column"
-        spacing={2}
+
+      <Box
         sx={{
-          minWidth: determineMinWidth(isMediumScreen, isSmallScreen),
+          flex: 1,
+          minWidth: 0,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
         }}
       >
         <Conversation
@@ -87,20 +54,19 @@ export default function MyPosts() {
         />
         <MyAnswer
           post={sendAnswer}
-          onNewAnswerSubmitted={handleNewAnswerSubmitted}
+          onNewAnswerSubmitted={() => setIsNewAnswerSubmitted((prev) => !prev)}
         />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            marginTop: "4rem",
-            marginBottom: "0.5rem",
-          }}
-        >
-          <LinkButton />
-        </div>
-      </Stack>
-    </Stack>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => navigate("/creer-post")}
+            sx={{ borderRadius: 2 }}
+          >
+            Créer un post
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 }

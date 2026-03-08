@@ -3,31 +3,22 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { PropTypes } from "prop-types";
-import { styled } from "@mui/system";
 import {
-  Grid,
-  Container,
-  TextField,
+  Box,
   Avatar,
-  useMediaQuery,
-  InputLabel,
+  Typography,
+  TextField,
   Button,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
-
-const StyledButton = styled(Button)({
-  backgroundColor: "#82BE00",
-  color: "#FFFFFF",
-  "&:hover": { backgroundColor: "#82BE00" },
-  fontSize: 9,
-  fontWeight: "bold",
-  width: "10%",
-  marginTop: "2%",
-  alignSelf: "flex-end",
-});
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import SendIcon from "@mui/icons-material/Send";
 
 export default function Post({
   pseudo,
-  user,
   tag,
   post,
   answers,
@@ -39,7 +30,6 @@ export default function Post({
   const [answerText, setAnswerText] = useState("");
   const token = localStorage.getItem("token");
   const localId = localStorage.getItem("userId");
-  const isMobile = useMediaQuery("(max-width: 600px)");
   const navigate = useNavigate();
 
   const handleAnswerSubmit = async (event) => {
@@ -47,14 +37,8 @@ export default function Post({
     try {
       await axios.post(
         "http://localhost:4000/answers",
-        {
-          user_id: localId,
-          post_id: postId,
-          answer_text: answerText,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { user_id: localId, post_id: postId, answer_text: answerText },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setAnswerText("");
       setNewAnswerSubmitted(!newAnswerSubmitted);
@@ -65,211 +49,160 @@ export default function Post({
   };
 
   return (
-    <Container
+    <Box
       sx={{
         backgroundColor: "#FFFFFF",
-        borderRadius: 2,
-        padding: "0%",
-        mb: "4%",
-        display: "flex",
-        justifyContent: "space-between",
-        flexDirection: isMobile && "column",
-        alignContent: isMobile && "stretch",
-        alignItems: isMobile && "center",
+        border: "1px solid #E2E8F0",
+        borderRadius: 3,
+        p: 2.5,
+        mb: 2,
       }}
     >
-      <Grid
-        container
-        mb="1%"
-        mr="5%"
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
+        <Avatar
+          sx={{
+            width: 40,
+            height: 40,
+            background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+            fontSize: 16,
+            fontWeight: 700,
+          }}
+        >
+          {pseudo.charAt(0).toUpperCase()}
+        </Avatar>
+        <Box sx={{ flex: 1 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: 14, color: "#0F172A" }}>
+            {pseudo}
+          </Typography>
+          <Typography sx={{ fontSize: 12, color: "#94A3B8" }}>
+            {format(new Date(postDate), "dd/MM/yyyy")}
+          </Typography>
+        </Box>
+        {tag && (
+          <Chip
+            label={tag}
+            size="small"
+            sx={{
+              backgroundColor: "#EEF2FF",
+              color: "#6366F1",
+              fontWeight: 600,
+              fontSize: 11,
+            }}
+          />
+        )}
+      </Box>
+
+      <Typography
         sx={{
-          flexDirection: isMobile && "column",
-          alignContent: isMobile && "center",
-          alignItems: isMobile && "center",
+          fontSize: 14,
+          color: "#334155",
+          lineHeight: 1.7,
+          mb: 2,
+          p: 2,
+          backgroundColor: "#F8FAFC",
+          borderRadius: 2,
+          border: "1px solid #E2E8F0",
+          whiteSpace: "pre-wrap",
         }}
       >
-        <Grid
-          item
-          xs={2}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+        {post}
+      </Typography>
+
+      {answers.length > 0 && (
+        <Accordion
+          elevation={0}
+          sx={{
+            border: "1px solid #E2E8F0",
+            borderRadius: "8px !important",
+            mb: 2,
+            "&:before": { display: "none" },
+          }}
         >
-          <Avatar
-            arial-label="Initiales de l'utilisateur"
-            key={user.id}
-            alt="pseudo"
-            sx={{
-              width: 60,
-              height: 60,
-              mt: 1,
-              alignSelf: "center",
-            }}
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon sx={{ color: "#64748B" }} />}
           >
-            {pseudo.charAt(0).toUpperCase()}
-          </Avatar>
-        </Grid>
-
-        <Grid item xs={10}>
-          <Grid container flexDirection="column" spacing={4} padding={1}>
-            <Grid item>
-              <InputLabel
-                htmlFor="pseudo-input"
-                sx={{
-                  color: "#0088CE",
-                  fontWeight: "bold",
-                }}
-              >
-                Pseudo
-              </InputLabel>
-              <TextField
-                id="pseudo-input"
-                aria-label="Pseudo de l'utilisateur qui a posté"
-                value={pseudo}
-                variant="standard"
-                sx={{
-                  width: "100%",
-                }}
-              />
-            </Grid>
-
-            <Grid item>
-              <InputLabel
-                htmlFor="tag-input"
-                sx={{
-                  color: "#0088CE",
-                  fontWeight: "bold",
-                }}
-              >
-                Titre
-              </InputLabel>
-              <TextField
-                id="tag-input"
-                aria-label="Titre du post"
-                value={tag}
-                variant="standard"
-                sx={{
-                  width: "100%",
-                }}
-              />
-            </Grid>
-            <Grid item color="#82BE00">
-              <InputLabel
-                htmlFor="post-input"
-                sx={{
-                  color: "#0088CE",
-                  fontSize: "smaller",
-                  fontWeight: "bold",
-                }}
-              >
-                Post publié le {format(new Date(postDate), "dd-MM-yyyy")}
-              </InputLabel>
-              <TextField
-                id="post-input"
-                aria-label="Texte du post"
-                value={post}
-                multiline
-                rows={1}
-                sx={{
-                  width: "100%",
-                  borderRadius: 2,
-                  border: "solid 2px #82BE00",
-                  backgroundColor: "#FFFFFF",
-                }}
-              />
-            </Grid>
-
-            {answers.map((answer) => (
-              <Grid item component="form" key={answer.answerId}>
-                <InputLabel
-                  htmlFor="answer-input"
+            <Typography
+              sx={{ fontSize: 13, fontWeight: 600, color: "#64748B" }}
+            >
+              {answers.length} réponse{answers.length > 1 ? "s" : ""}
+            </Typography>
+          </AccordionSummary>
+          {answers.map((answer) => (
+            <AccordionDetails
+              key={answer.answerId}
+              sx={{ pt: 0, pb: 1, px: 2 }}
+            >
+              <Box sx={{ mb: 1 }}>
+                <Typography sx={{ fontSize: 11, color: "#94A3B8", mb: 0.5 }}>
+                  {answer.userAnswer?.pseudo || "Utilisateur"} —{" "}
+                  {format(new Date(answer.dateAnswer), "dd/MM/yyyy")}
+                </Typography>
+                <Typography
                   sx={{
-                    color: "#0088CE",
-                    fontSize: "smaller",
-                    fontWeight: "bold",
+                    fontSize: 13,
+                    color: "#475569",
+                    p: 1.5,
+                    backgroundColor: "#F8FAFC",
+                    borderRadius: 1.5,
+                    border: "1px solid #E2E8F0",
+                    whiteSpace: "pre-wrap",
                   }}
                 >
-                  Réponse de {answer.userAnswer.pseudo} du{" "}
-                  {format(new Date(answer.dateAnswer), "dd-MM-yyyy")}
-                </InputLabel>
-                {answer && (
-                  <TextField
-                    id="answer-input"
-                    aria-label="Réponse au post"
-                    value={answer.textAnswer}
-                    multiline
-                    rows={1}
-                    sx={{
-                      width: "100%",
-                      borderRadius: 2,
-                      border: "solid 2px #82BE00",
-                      backgroundColor: "white",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                )}
-              </Grid>
-            ))}
-            <Grid
-              item
-              component="form"
-              onSubmit={handleAnswerSubmit}
-              display="flex"
-              flexDirection="column"
-            >
-              <InputLabel
-                htmlFor="answer-input"
-                sx={{
-                  color: "#0088CE",
-                  fontSize: "smaller",
-                  fontWeight: "bold",
-                  paddingBottom: "3%",
-                }}
-              >
-                Répondre à {pseudo}
-              </InputLabel>
-              <TextField
-                id="answer-input"
-                aria-label="réponse de l'utilisateur au post"
-                value={answerText}
-                onChange={(e) => setAnswerText(e.target.value)}
-                multiline
-                rows={2}
-                sx={{
-                  width: "100%",
-                  borderRadius: 2,
-                  border: "solid 2px #82BE00",
-                  backgroundColor: "#FFFFFF",
-                  boxSizing: "border-box",
-                }}
-              />
-              <StyledButton type="submit" aria-label="Soumettre une réponse">
-                Poster
-              </StyledButton>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Container>
+                  {answer.textAnswer}
+                </Typography>
+              </Box>
+            </AccordionDetails>
+          ))}
+        </Accordion>
+      )}
+
+      <Box
+        component="form"
+        onSubmit={handleAnswerSubmit}
+        sx={{ display: "flex", gap: 1 }}
+      >
+        <TextField
+          value={answerText}
+          onChange={(e) => setAnswerText(e.target.value)}
+          placeholder={`Répondre à ${pseudo}...`}
+          multiline
+          rows={2}
+          size="small"
+          fullWidth
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: "#F8FAFC",
+              "& fieldset": { borderColor: "#E2E8F0" },
+            },
+          }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          size="small"
+          sx={{ alignSelf: "flex-end", minWidth: 44, px: 1.5, borderRadius: 2 }}
+        >
+          <SendIcon sx={{ fontSize: 18 }} />
+        </Button>
+      </Box>
+    </Box>
   );
 }
+
 Post.propTypes = {
   pseudo: PropTypes.string.isRequired,
   tag: PropTypes.string.isRequired,
   post: PropTypes.string.isRequired,
-  answers: PropTypes.string.isRequired,
-  postDate: PropTypes.string.isRequired,
-  user: PropTypes.arrayOf(
+  answers: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      picture: PropTypes.instanceOf(Blob).isRequired,
+      answerId: PropTypes.number,
+      textAnswer: PropTypes.string,
+      dateAnswer: PropTypes.string,
+      userAnswer: PropTypes.shape({ pseudo: PropTypes.string }),
     })
-  ),
+  ).isRequired,
+  postDate: PropTypes.string.isRequired,
   newAnswerSubmitted: PropTypes.bool.isRequired,
   setNewAnswerSubmitted: PropTypes.func.isRequired,
   postId: PropTypes.number.isRequired,
-};
-
-Post.defaultProps = {
-  user: [],
 };

@@ -3,34 +3,23 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { styled } from "@mui/system";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
-  Grid,
+  Box,
   Typography,
-  Container,
-  TextField,
   Avatar,
+  TextField,
+  IconButton,
+  Chip,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  useMediaQuery,
-  Button,
-  IconButton,
+  Tooltip,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SendIcon from "@mui/icons-material/Send";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import EditAnswer from "./EditAnswer";
-
-const StyledButton = styled(Button)({
-  backgroundColor: "#82BE00",
-  color: "#FFFFFF",
-  "&:hover": { backgroundColor: "#82BE00" },
-  fontSize: 9,
-  fontWeight: "bold",
-  width: "10%",
-  marginRight: "6%",
-  marginTop: "1%",
-});
 
 export default function PostCard({
   postUsers,
@@ -47,25 +36,21 @@ export default function PostCard({
   handleUpdateAnswer,
 }) {
   const [answerText, setAnswerText] = useState("");
-
   const token = localStorage.getItem("token");
   const localId = localStorage.getItem("userId");
-  const isMobile = useMediaQuery("(max-width: 600px)");
   const navigate = useNavigate();
+
+  const isOwner = postUserId.toString() === localId?.toString();
+  const author = postUsers?.[0];
 
   const handleAnswerSubmit = async (event) => {
     event.preventDefault();
+    if (!answerText.trim()) return;
     try {
       await axios.post(
         "http://localhost:4000/answers",
-        {
-          user_id: localId,
-          post_id: postId,
-          answer_text: answerText,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { user_id: localId, post_id: postId, answer_text: answerText },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setAnswerText("");
       setNewAnswerSubmitted(!newAnswerSubmitted);
@@ -77,159 +62,136 @@ export default function PostCard({
 
   const handleDeletePost = async () => {
     try {
-      const response = await axios.delete(
-        `http://localhost:4000/posts/${postId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`http://localhost:4000/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setPostDeleted(!postDeleted);
-      if (response.status === 204) {
-        navigate("/creer-post");
-      }
     } catch (error) {
       console.error(error);
       navigate("/erreur404");
     }
   };
 
-  const renderDeleteButton = () => {
-    if (postUserId.toString() === localId.toString()) {
-      return (
-        <IconButton
-          aria-label="delete"
-          size="small"
-          onClick={() => handleDeletePost(postId)}
-        >
-          <DeleteIcon sx={{ color: "#82BE00" }} />
-        </IconButton>
-      );
-    }
-    return null;
-  };
-
   return (
-    <Container
+    <Box
       sx={{
         backgroundColor: "#FFFFFF",
-        borderRadius: 1,
+        border: "1px solid #E2E8F0",
+        borderRadius: 3,
+        overflow: "hidden",
+        transition: "box-shadow 0.2s",
+        "&:hover": { boxShadow: "0 4px 16px rgba(0,0,0,0.06)" },
       }}
     >
-      <Grid
-        container
-        mb={1}
+      {/* Header */}
+      <Box
         sx={{
-          flexDirection: isMobile && "column",
-          alignContent: isMobile && "stretch",
+          p: 2.5,
+          pb: 0,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 2,
         }}
       >
-        <Grid item sm={2} xs={12} display="flex" justifyContent="center">
-          {postUsers?.map((user) => (
-            <Avatar
-              key={user.id}
-              alt="pseudo"
+        <Avatar
+          sx={{
+            width: 40,
+            height: 40,
+            background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+            fontSize: 16,
+            fontWeight: 700,
+            flexShrink: 0,
+          }}
+        >
+          {author?.pseudo?.charAt(0).toUpperCase()}
+        </Avatar>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            <Typography
+              sx={{ fontWeight: 600, color: "#0F172A", fontSize: 14 }}
+            >
+              {author?.pseudo}
+            </Typography>
+            <Typography sx={{ color: "#94A3B8", fontSize: 12 }}>·</Typography>
+            <Typography sx={{ color: "#94A3B8", fontSize: 12 }}>
+              {format(new Date(postDate), "dd MMM yyyy")}
+            </Typography>
+            <Chip
+              label={postTag}
+              size="small"
               sx={{
-                width: 60,
-                height: 60,
-                bgcolor: "#82BE00",
-                mr: isMobile ? 0 : 2,
-                mt: 1,
-                alignSelf: "center",
+                backgroundColor: "#EEF2FF",
+                color: "#6366F1",
+                fontWeight: 600,
+                fontSize: 11,
+                height: 20,
+                ml: "auto",
+              }}
+            />
+          </Box>
+        </Box>
+        {isOwner && (
+          <Tooltip title="Supprimer le post">
+            <IconButton
+              size="small"
+              onClick={handleDeletePost}
+              sx={{
+                color: "#CBD5E1",
+                "&:hover": { color: "#EF4444", backgroundColor: "#FEF2F2" },
               }}
             >
-              {user.pseudo.charAt(0).toUpperCase()}
-            </Avatar>
-          ))}
-        </Grid>
-        <Grid item sm={10} xs={12}>
-          <Grid container direction="column" spacing={0.6}>
-            <Grid item sx={{ mt: isMobile ? 0 : 1 }}>
-              <Typography color="#82BE00" fontWeight="bold">
-                TAG
-              </Typography>
-            </Grid>
-            <Grid item sx={{ m: 0 }}>
-              <TextField
-                aria-label="tag"
-                value={postTag}
-                multiline
-                rows={1}
-                size="small"
-                sx={{
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 1,
-                  border: "solid 1px #82BE00",
-                  minWidth: "100%",
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid container mb={1} direction="column">
-        {postUsers.map((user) => (
-          <Accordion defaultExpanded key={user.id}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>Post de {user.pseudo}</Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{ pb: 1 }}>
-              <Grid item>
-                <TextField
-                  aria-label="post content"
-                  value={postText}
-                  multiline
-                  rows={5}
-                  size="small"
-                  InputLabelProps={{ shrink: true }}
-                  label={format(new Date(postDate), "dd-MM-yyyy")}
-                  sx={{
-                    width: "100%",
-                    borderRadius: 1,
-                    border: "solid 1px #82BE00",
-                    bgColor: "#FFFFFF",
-                  }}
-                />
-              </Grid>
-              <Grid item>{renderDeleteButton()}</Grid>
-            </AccordionDetails>
-          </Accordion>
-        ))}
-      </Grid>
-      {postAnswers?.length === 0 ? (
-        <Grid
-          container
-          direction="column"
-          mb={1}
-          component="form"
-          onSubmit={handleAnswerSubmit}
-          sx={{ alignItems: "flex-end" }}
+              <DeleteOutlineIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+
+      {/* Content */}
+      <Box sx={{ px: 2.5, pt: 1.5, pb: 2 }}>
+        <Typography
+          sx={{
+            color: "#334155",
+            fontSize: 14,
+            lineHeight: 1.7,
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
         >
-          <TextField
-            aria-label="write an answer"
-            InputLabelProps={{ shrink: true }}
-            label="Il n'y a pas encore de réponse pour ce post ! Pourquoi pas vous ?"
-            value={answerText}
-            onChange={(e) => setAnswerText(e.target.value)}
-            multiline
-            rows={2}
-            sx={{
-              backgroundColor: "#FFFFFF",
-              border: "dotted 1px #82BE00",
-              borderRadius: 1,
-              width: "100%",
-              fontStyle: "italic",
-              mt: 1,
-            }}
-          />
-          <StyledButton type="submit">Poster</StyledButton>
-        </Grid>
-      ) : (
-        <Grid item>
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>Réponse(s) au post</Typography>
-            </AccordionSummary>
-            {postAnswers?.map((answer) => (
+          {postText}
+        </Typography>
+      </Box>
+
+      {/* Answers */}
+      {postAnswers.length > 0 && (
+        <Accordion
+          sx={{
+            borderTop: "1px solid #F1F5F9",
+            "& .MuiAccordionSummary-root": { px: 2.5, minHeight: 44 },
+          }}
+        >
+          <AccordionSummary
+            expandIcon={
+              <ExpandMoreIcon sx={{ fontSize: 18, color: "#94A3B8" }} />
+            }
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <ChatBubbleOutlineIcon sx={{ fontSize: 15, color: "#6366F1" }} />
+              <Typography
+                sx={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}
+              >
+                {postAnswers.length} réponse{postAnswers.length > 1 ? "s" : ""}
+              </Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={{ px: 2.5, pt: 0, pb: 1 }}>
+            {postAnswers.map((answer) => (
               <EditAnswer
                 key={answer.id}
                 postId={postId}
@@ -238,41 +200,60 @@ export default function PostCard({
                 handleUpdateAnswer={handleUpdateAnswer}
               />
             ))}
-          </Accordion>
-          {postUsers?.map((user) => (
-            <Grid
-              container
-              mb={1}
-              direction="column"
-              component="form"
-              onSubmit={handleAnswerSubmit}
-              key={user.id}
-              sx={{ alignItems: "flex-end" }}
-            >
-              <TextField
-                key={user.id}
-                aria-label="write an answer"
-                InputLabelProps={{ shrink: true }}
-                label={`Souhaitez-vous apporter votre aide à ${user.pseudo}`}
-                value={answerText}
-                onChange={(e) => setAnswerText(e.target.value)}
-                multiline
-                rows={2}
-                sx={{
-                  backgroundColor: "#FFFFFF",
-                  border: "dotted 1px #82BE00",
-                  borderRadius: 1,
-                  width: "100%",
-                  fontStyle: "italic",
-                  mt: 2,
-                }}
-              />
-              <StyledButton type="submit">Poster</StyledButton>
-            </Grid>
-          ))}
-        </Grid>
+          </AccordionDetails>
+        </Accordion>
       )}
-    </Container>
+
+      {/* Answer form */}
+      <Box
+        component="form"
+        onSubmit={handleAnswerSubmit}
+        sx={{
+          borderTop: "1px solid #F1F5F9",
+          px: 2.5,
+          py: 2,
+          display: "flex",
+          gap: 1.5,
+          alignItems: "flex-end",
+        }}
+      >
+        <TextField
+          value={answerText}
+          onChange={(e) => setAnswerText(e.target.value)}
+          multiline
+          maxRows={4}
+          size="small"
+          placeholder={
+            postAnswers.length === 0
+              ? "Soyez le premier à répondre..."
+              : `Répondre à ${author?.pseudo}...`
+          }
+          fullWidth
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              fontSize: 13,
+              backgroundColor: "#F8FAFC",
+            },
+          }}
+        />
+        <IconButton
+          type="submit"
+          disabled={!answerText.trim()}
+          sx={{
+            width: 36,
+            height: 36,
+            backgroundColor: "#6366F1",
+            color: "#fff",
+            borderRadius: "9px",
+            flexShrink: 0,
+            "&:hover": { backgroundColor: "#4F46E5" },
+            "&:disabled": { backgroundColor: "#E2E8F0", color: "#94A3B8" },
+          }}
+        >
+          <SendIcon sx={{ fontSize: 16 }} />
+        </IconButton>
+      </Box>
+    </Box>
   );
 }
 
@@ -291,7 +272,6 @@ PostCard.propTypes = {
   postUsers: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      picture: PropTypes.instanceOf(Blob),
       pseudo: PropTypes.string.isRequired,
     })
   ).isRequired,

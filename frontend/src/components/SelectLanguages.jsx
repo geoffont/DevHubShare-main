@@ -42,7 +42,7 @@ export default function SelectLanguage() {
     >
       <Select
         sx={{
-          color: "#009AA6",
+          color: "#6366F1",
           height: 30,
           borderRadius: 1,
           fontSize: 14,
@@ -59,7 +59,7 @@ export default function SelectLanguage() {
         {sideLanguages.map((langage) => (
           <MenuItem
             sx={{
-              color: "#009AA6",
+              color: "#6366F1",
             }}
             key={langage.id}
             value={langage.language_name}

@@ -1,143 +1,112 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { Box, Typography, Avatar, Collapse, IconButton } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Grid,
-  Typography,
-  Container,
-  TextField,
-  Avatar,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  useMediaQuery,
-} from "@mui/material";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 export default function ProfileCard({ pseudo, email, userText, onClickUser }) {
-  const isMobile = useMediaQuery("(max-width: 600px)");
+  const [expanded, setExpanded] = useState(false);
 
   return (
-    <Container
+    <Box
       sx={{
         backgroundColor: "#FFFFFF",
-        borderRadius: 1,
+        border: "1px solid #E2E8F0",
+        borderRadius: 3,
+        p: 2,
+        width: "100%",
+        transition: "box-shadow 0.2s, transform 0.2s",
+        "&:hover": {
+          boxShadow: "0 4px 16px rgba(99,102,241,0.08)",
+          transform: "translateY(-1px)",
+        },
       }}
     >
-      <Grid
-        container
-        sx={{
-          flexDirection: isMobile && "column",
-          alignContent: isMobile && "center",
-        }}
-      >
-        <Grid
-          item
-          sm={2}
-          xs={12}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Avatar
+          onClick={onClickUser}
+          sx={{
+            width: 48,
+            height: 48,
+            background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+            fontSize: 18,
+            fontWeight: 700,
+            cursor: "pointer",
+            flexShrink: 0,
+            "&:hover": { opacity: 0.85 },
+          }}
         >
-          <Avatar
+          {pseudo.charAt(0).toUpperCase()}
+        </Avatar>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
             onClick={onClickUser}
-            alt="pseudo"
             sx={{
-              width: isMobile ? 60 : 70,
-              height: isMobile ? 60 : 70,
-              mr: isMobile ? 0 : 3,
-              "&:hover": { boxShadow: "0px 8px 15px -2px #D7D7D7" },
-              mt: isMobile && 1,
+              fontWeight: 700,
+              color: "#0F172A",
+              fontSize: 15,
+              cursor: "pointer",
+              "&:hover": { color: "#6366F1" },
+              transition: "color 0.15s",
             }}
           >
-            {pseudo.charAt(0).toUpperCase()}
-          </Avatar>
-        </Grid>
-        <Grid item sm={10} xs={12}>
-          <Grid container direction="column" spacing={0.6} sx={{ m: 0 }}>
-            <Grid item>
-              <Typography color="#009AA6" fontWeight="bold">
-                Pseudo
-              </Typography>
-            </Grid>
-            <Grid item>
-              <TextField
-                aria-label="pseudo"
-                readOnly
-                value={pseudo}
-                size="small"
-                sx={{
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 1,
-                  border: "solid 1px #009AA6",
-                  minWidth: isMobile ? "100%" : "97%",
-                }}
-              />
-            </Grid>
-            <Grid item>
-              <Typography color="#009AA6" fontWeight="bold">
-                email
-              </Typography>
-            </Grid>
-            <Grid item>
-              <TextField
-                aria-label="email"
-                readOnly
-                value={email}
-                size="small"
-                sx={{
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 1,
-                  border: "solid 1px #009AA6",
-                  width: isMobile ? "100%" : "97%",
-                  mb: 1,
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item sx={{ m: 1, width: "100%" }}>
-          {userText ? (
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography sx={{ color: "#009AA6" }}>
-                  Texte libre de {pseudo}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <TextField
-                  aria-label="user-text"
-                  readOnly
-                  value={userText}
-                  multiline
-                  rows={2}
-                  size="small"
-                  sx={{
-                    width: "100%",
-                    borderRadius: 1,
-                    border: "solid 1px #009AA6",
-                    backgroundColor: "#FFFFFF",
-                  }}
-                />
-              </AccordionDetails>
-            </Accordion>
-          ) : (
-            <TextField
-              aria-label="no-user-text"
-              disabled
-              value={`Il n'y a pas  de texte libre pour ${pseudo} !`}
-              size="small"
+            {pseudo}
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <EmailOutlinedIcon sx={{ fontSize: 13, color: "#94A3B8" }} />
+            <Typography
               sx={{
-                width: "100%",
-                borderRadius: 1,
-                border: "dotted 1px #009AA6",
-                backgroundColor: "#FFFFFF",
-                fontStyle: "italic",
+                color: "#64748B",
+                fontSize: 13,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
+            >
+              {email}
+            </Typography>
+          </Box>
+        </Box>
+        {userText && (
+          <IconButton
+            size="small"
+            onClick={() => setExpanded((p) => !p)}
+            sx={{
+              color: expanded ? "#6366F1" : "#94A3B8",
+              backgroundColor: expanded ? "#EEF2FF" : "transparent",
+              transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "all 0.2s",
+            }}
+          >
+            <ExpandMoreIcon fontSize="small" />
+          </IconButton>
+        )}
+      </Box>
+
+      {userText && (
+        <Collapse in={expanded}>
+          <Box
+            sx={{
+              mt: 2,
+              pt: 2,
+              borderTop: "1px solid #F1F5F9",
+              display: "flex",
+              gap: 1,
+            }}
+          >
+            <ChatBubbleOutlineIcon
+              sx={{ fontSize: 16, color: "#94A3B8", mt: 0.25, flexShrink: 0 }}
             />
-          )}
-        </Grid>
-      </Grid>
-    </Container>
+            <Typography
+              sx={{ color: "#64748B", fontSize: 13.5, lineHeight: 1.6 }}
+            >
+              {userText}
+            </Typography>
+          </Box>
+        </Collapse>
+      )}
+    </Box>
   );
 }
 

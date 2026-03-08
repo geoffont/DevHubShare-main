@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prettier --write \"src/**/*.{jsx,js}\")",
+      "Bash(npx eslint --ext .jsx src/)"
+    ]
+  }
+}

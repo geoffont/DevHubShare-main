@@ -1,33 +1,56 @@
 import React from "react";
-import { Container } from "@mui/material";
-import { styled } from "@mui/system";
+import { Box, Typography, Button } from "@mui/material";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 import { useNavigate } from "react-router-dom";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import Error404 from "../assets/Error404.jpg";
 
 export default function NotFoundError() {
-  const isMobile = useMediaQuery("(max-width: 600px)");
-
-  const Error = styled("img")({
-    width: isMobile ? "25rem" : "50rem",
-    margin: "auto",
-    marginTop: "10%",
-  });
-
   const navigate = useNavigate();
-  const handlePage = () => {
-    navigate("/");
-  };
-
   return (
-    <Container
-      onClick={handlePage}
-      position="center"
+    <Box
       sx={{
         display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "60vh",
+        textAlign: "center",
+        px: 2,
       }}
     >
-      <Error src={Error404} alt="Erreur" />
-    </Container>
+      <Box
+        sx={{
+          width: 80,
+          height: 80,
+          borderRadius: "20px",
+          backgroundColor: "#FEF2F2",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mb: 3,
+        }}
+      >
+        <SearchOffIcon sx={{ fontSize: 40, color: "#EF4444" }} />
+      </Box>
+      <Typography
+        variant="h2"
+        sx={{ fontWeight: 800, color: "#0F172A", mb: 1 }}
+      >
+        404
+      </Typography>
+      <Typography
+        variant="h5"
+        sx={{ fontWeight: 600, color: "#0F172A", mb: 1 }}
+      >
+        Page introuvable
+      </Typography>
+      <Typography
+        sx={{ color: "#64748B", mb: 4, maxWidth: 380, lineHeight: 1.7 }}
+      >
+        La page que vous recherchez n'existe pas ou a été déplacée.
+      </Typography>
+      <Button variant="contained" size="large" onClick={() => navigate("/")}>
+        Retour à l'accueil
+      </Button>
+    </Box>
   );
 }

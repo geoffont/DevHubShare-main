@@ -41,7 +41,7 @@ export default function LangSelectSignUp({ onChange }) {
       >
         <Select
           sx={{
-            color: "#009AA6",
+            color: "#6366F1",
             height: 30,
             borderRadius: 1,
             fontSize: 14,
@@ -59,7 +59,7 @@ export default function LangSelectSignUp({ onChange }) {
           {sideLanguages.map((language) => (
             <MenuItem
               sx={{
-                color: "#009AA6",
+                color: "#6366F1",
               }}
               key={language.id}
               value={language.language_name}

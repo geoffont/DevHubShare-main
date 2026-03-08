@@ -1,85 +1,67 @@
 import React from "react";
-import {
-  Container,
-  Grid,
-  Link,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
-import { styled } from "@mui/system";
-import LogoSNCF from "../assets/LOGO_SNCF_GROUPE_RVB_small.png";
-
-const Logo = styled("img")({
-  width: "4rem",
-});
-
-const FooterLink = styled(Link)({
-  marginRight: "1rem",
-  marginLeft: "1rem",
-  textDecoration: "none",
-  color: "#FFFFFF",
-  "&:hover": {
-    color: "#B9B9B9",
-  },
-});
-
-const FooterContainer = styled(Container)({
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  backgroundColor: "#333333",
-  color: "#FFFFFF",
-  minWidth: "100vw",
-  position: "fixed",
-  bottom: 0,
-  left: 0,
-  right: 0,
-});
+import { Box, Typography, Link } from "@mui/material";
+import CodeIcon from "@mui/icons-material/Code";
 
 export default function Footer() {
-  const isMobile = useMediaQuery("(max-width: 600px)");
-
   return (
-    <FooterContainer>
-      <Grid sx={{ alignSelf: "center" }}>
-        <Logo
-          src={LogoSNCF}
-          alt="logo"
+    <Box
+      component="footer"
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: "var(--footer-height)",
+        backgroundColor: "#0F172A",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: { xs: 2, md: 3 },
+        zIndex: 100,
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <CodeIcon sx={{ color: "#6366F1", fontSize: 16 }} />
+        <Typography sx={{ color: "#475569", fontSize: 12, fontWeight: 500 }}>
+          DevHubSHARE
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 2.5 }}>
+        <Link
+          href="https://github.com/WildCodeSchool/DevHubConnect"
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="none"
           sx={{
-            ml: isMobile ? "0rem" : "0.8rem",
-          }}
-        />
-      </Grid>
-      <Grid
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        <FooterLink href="https://github.com/WildCodeSchool/DevHubConnect">
-          DevHub Connect {">"}
-        </FooterLink>
-        <FooterLink href="https://github.com/WildCodeSchool/DevHubProject">
-          DevHub Project {">"}
-        </FooterLink>
-      </Grid>
-      <Grid
-        sx={{
-          alignSelf: isMobile ? "center" : "flex-end",
-        }}
-      >
-        <Typography
-          variant="caption"
-          sx={{
-            fontSize: "0.5rem",
-            mr: isMobile ? "0.2rem" : "1.6rem",
+            color: "#475569",
+            fontSize: 12,
+            "&:hover": { color: "#818CF8" },
+            transition: "color 0.15s",
           }}
         >
-          <em>WCS Marseille 2023_Créé par Nelly, Karine, Sandra et Geoffroy</em>
-        </Typography>
-      </Grid>
-    </FooterContainer>
+          DevHub Connect
+        </Link>
+        <Link
+          href="https://github.com/WildCodeSchool/DevHubProject"
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="none"
+          sx={{
+            color: "#475569",
+            fontSize: 12,
+            "&:hover": { color: "#818CF8" },
+            transition: "color 0.15s",
+          }}
+        >
+          DevHub Project
+        </Link>
+      </Box>
+
+      <Typography sx={{ color: "#334155", fontSize: 11 }}>
+        WCS Marseille 2023
+      </Typography>
+    </Box>
   );
 }

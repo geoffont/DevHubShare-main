@@ -1,20 +1,10 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { List, Grid, TextField } from "@material-ui/core";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    paddingLeft: 5,
-    marginBottom: theme.spacing(2),
-  },
-}));
+import { Box, TextField, Typography } from "@mui/material";
 
 function TexteLibre() {
-  const [textArea, setTextArea] = useState("");
-  const classes = useStyles();
+  const [userData, setUserData] = useState({});
   const { userIdSelected } = useParams();
   const token = localStorage.getItem("token");
 
@@ -23,27 +13,30 @@ function TexteLibre() {
       .get(`http://localhost:4000/users/${userIdSelected}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        setTextArea(response.data);
-      });
-  }, []);
+      .then((response) => setUserData(response.data));
+  }, [userIdSelected]);
 
   return (
-    <div className={classes.root}>
-      <h3>Texte libre</h3>
-      <List>
-        <Grid item xs={12}>
-          <TextField
-            className={classes.field}
-            value={`${textArea.user_text ? ` ${textArea.user_text}` : ""}`}
-            multiline
-            minRows={8}
-            fullWidth
-            disabled
-          />
-        </Grid>
-      </List>
-    </div>
+    <Box>
+      <Typography
+        sx={{ fontSize: 12, fontWeight: 600, color: "#475569", mb: 1 }}
+      >
+        Texte libre
+      </Typography>
+      <TextField
+        value={userData.user_text || ""}
+        multiline
+        minRows={8}
+        fullWidth
+        InputProps={{ readOnly: true }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            backgroundColor: "#F8FAFC",
+            "& fieldset": { borderColor: "#E2E8F0" },
+          },
+        }}
+      />
+    </Box>
   );
 }
 

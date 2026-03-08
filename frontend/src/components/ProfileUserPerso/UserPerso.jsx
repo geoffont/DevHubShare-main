@@ -1,56 +1,43 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Card, CardContent, Button } from "@material-ui/core";
+import { Grid, Box, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import InfoUser from "./InfoUser";
 import TextPerso from "./TextPerso";
 
-const useStyles = makeStyles((theme) => ({
-  card: {
-    background: "#82BE00",
-    marginBottom: theme.spacing(2),
-  },
-  texteLibreContainer: {
-    background: "#FFF",
-    borderRadius: 5,
-    marginBottom: theme.spacing(2),
-  },
-  gridCard: {
-    display: "grid",
-    alignItems: "center",
-  },
-  valider: {
-    display: "flex",
-    justifyContent: "flex-end",
-    marginTop: theme.spacing(1),
-  },
-}));
-
 function UserProfile() {
-  const classes = useStyles();
+  const navigate = useNavigate();
 
   return (
-    <div>
-      <Grid container spacing={1}>
-        <Grid item xs={12} md={6}>
-          <InfoUser />
-        </Grid>
-        <Grid className={classes.gridCard} item xs={12} md={6}>
-          <Card className={classes.card}>
-            <CardContent>
-              <div className={classes.texteLibreContainer}>
-                <TextPerso />
-              </div>
-            </CardContent>
-          </Card>
-          <Grid item xs={12} className={classes.valider}>
-            <Button variant="text" href="/creation-compte">
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6}>
+        <InfoUser />
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Box
+          sx={{
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E2E8F0",
+            borderRadius: 3,
+            p: 3,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <TextPerso />
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => navigate("/creation-compte")}
+              sx={{ borderRadius: 2 }}
+            >
               Modifier le profil
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Grid>
-    </div>
+    </Grid>
   );
 }
 

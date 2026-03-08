@@ -1,161 +1,217 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import AppBar from "@mui/material/AppBar";
-import { Container, Grid, useMediaQuery } from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { styled } from "@mui/system";
-import { Link } from "react-router-dom";
-import LogoSNCF from "./images/DevHubSHARE_logo.png";
-import NotificationImg from "./images/bellNotification.png";
+import PropTypes from "prop-types";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Avatar,
+  Box,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import CodeIcon from "@mui/icons-material/Code";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const Links = styled(Link)({
-  color: "#0088CE",
-  textDecoration: "none",
-});
-
-const Button = styled("button")({
-  border: "none",
-  background: "none",
-  color: "#0088CE",
-});
-
-const Logo = styled("img")({
-  maxWidth: "7rem",
-  minWidth: "6rem",
-});
-
-const Icon = styled("img")({
-  width: "1.8rem",
-  position: "absolute",
-});
-
-export default function Header() {
-  const [answers, setAnswers] = useState([]);
-  const [posts, setPosts] = useState([]);
-  const [newResponsesCount, setNewResponsesCount] = useState();
-  const isMobile = useMediaQuery("(max-width: 600px)");
-  const isTablet = useMediaQuery("(max-width: 900px)");
+export default function Header({ onMenuClick }) {
+  const [newResponsesCount, setNewResponsesCount] = useState(0);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
   const localId = localStorage.getItem("userId");
-
-  const filteredPosts = posts.filter((post) => post.user_id === localId);
-
-  const filteredAnswers = answers.filter(
-    (answer) =>
-      answer.user_id !== localId && answer.post_id === filteredPosts[0]?.id
-  );
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
 
   useEffect(() => {
-    setNewResponsesCount(
-      filteredAnswers.filter(
-        (answer) => answer.post_id === filteredPosts[0]?.id
-      ).length
-    );
-  }, [filteredAnswers, filteredPosts]);
+    if (!localId || !token) return;
+    const fetchNotifications = async () => {
+      try {
+        const [answersRes, postsRes] = await Promise.all([
+          axios.get("http://localhost:4000/answers", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("http://localhost:4000/posts", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        const myPosts = postsRes.data.filter(
+          (p) => p.user_id.toString() === localId
+        );
+        const myPostIds = myPosts.map((p) => p.id);
+        const count = answersRes.data.filter(
+          (a) =>
+            myPostIds.includes(a.post_id) && a.user_id.toString() !== localId
+        ).length;
+        setNewResponsesCount(count);
+      } catch {
+        // silent
+      }
+    };
+    fetchNotifications();
+  }, [localId, token]);
+
   return (
-    <Container
+    <AppBar
       position="fixed"
+      elevation={0}
       sx={{
-        maxHeight: "96px",
-        display: "flex",
-        alignItems: "flex-start",
+        backgroundColor: "#FFFFFF",
+        borderBottom: "1px solid #E2E8F0",
+        zIndex: (t) => t.zIndex.drawer + 1,
+        height: "var(--header-height)",
       }}
     >
-      <AppBar
+      <Toolbar
         sx={{
-          backgroundColor: "#FFFFFF",
-          borderBottom: "solid 1px #D7D7D7",
-          flexWrap: "nowrap",
-          boxShadow: "none",
+          height: "var(--header-height)",
+          px: { xs: 2, md: 3 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <Toolbar sx={{ padding: 0 }}>
-          <Grid
-            container
-            item
-            sx={{
+        {/* Left: hamburger (mobile) + logo */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {isMobile && (
+            <IconButton
+              onClick={onMenuClick}
+              sx={{ color: "#64748B", p: 1 }}
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              gap: 8,
             }}
           >
-            <Grid item xl={2} lg={2} md={2} sm={2.7} xs={3}>
-              <Logo
-                src={LogoSNCF}
-                alt="logo"
-                sx={{
-                  display: isMobile && "flex",
-                  flexDirection: isMobile && "row",
-                  justifySelf: isMobile && "flex-end",
-                }}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={0}
+            <Box
               sx={{
-                display: isMobile && "none",
+                width: 34,
+                height: 34,
+                borderRadius: "9px",
+                background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
+              <CodeIcon sx={{ color: "#fff", fontSize: 18 }} />
+            </Box>
+            {!isMobile && (
               <Typography
-                variant="h4"
+                variant="h6"
                 sx={{
-                  textAlign: "center",
-                  fontSize: isTablet ? "250%" : "400%",
-                  color: "#009AA6",
+                  color: "#0F172A",
+                  fontWeight: 700,
+                  letterSpacing: "-0.5px",
                 }}
               >
-                DevHubSHARE
+                DevHub<span style={{ color: "#6366F1" }}>SHARE</span>
               </Typography>
-            </Grid>
-            <Grid
-              container
-              item
-              xl={2}
-              lg={2}
-              md={2}
-              sm={2.7}
-              xs={9}
+            )}
+          </Link>
+        </Box>
+
+        {/* Right: actions */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {isLoggedIn && (
+            <IconButton
               sx={{
-                display: "flex",
-                flexDirection: isMobile ? "row" : "column",
-                justifyContent: isMobile && "center",
-                alignContent: "flex-end",
-                alignItems: "center",
+                color: "#64748B",
+                position: "relative",
+                "&:hover": { backgroundColor: "#F1F5F9" },
+              }}
+              aria-label="notifications"
+            >
+              <NotificationsNoneIcon />
+              {newResponsesCount > 0 && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 6,
+                    right: 6,
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    backgroundColor: "#EF4444",
+                    border: "2px solid #fff",
+                  }}
+                />
+              )}
+            </IconButton>
+          )}
+
+          {isLoggedIn ? (
+            <Avatar
+              onClick={() => navigate("/mon-compte")}
+              sx={{
+                width: 34,
+                height: 34,
+                background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                "&:hover": { opacity: 0.85 },
               }}
             >
-              <Button color="inherit">
-                <Typography variant="h6">
-                  <Links to="/connexion">Connexion</Links>
+              {localId ? localId.charAt(0) : "U"}
+            </Avatar>
+          ) : (
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Link to="/connexion" style={{ textDecoration: "none" }}>
+                <Typography
+                  sx={{
+                    color: "#64748B",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    px: 1.5,
+                    py: 0.75,
+                    borderRadius: 2,
+                    "&:hover": { backgroundColor: "#F1F5F9", color: "#0F172A" },
+                    transition: "all 0.15s",
+                  }}
+                >
+                  Connexion
                 </Typography>
-              </Button>
-              <Button color="inherit">
-                <Typography variant="h6">
-                  <Links to="/mon-compte">Mon compte</Links>
-                </Typography>
-              </Button>
-              <Button sx={{ p: 0 }}>
-                <Icon src={NotificationImg} alt="notificationBell" />
-                {newResponsesCount >= 0 && (
-                  <Typography
-                    sx={{
-                      backgroundColor: "red",
-                      position: "relative",
-                      bottom: "0.5rem",
-                      left: "1.7rem",
-                      height: "1.1rem",
-                      width: "1.2rem",
-                      borderRadius: "60%",
-                    }}
-                  >
-                    {newResponsesCount}
-                  </Typography>
-                )}
-              </Button>
-            </Grid>
-          </Grid>
-        </Toolbar>
-      </AppBar>
-    </Container>
+              </Link>
+              <Link to="/inscription" style={{ textDecoration: "none" }}>
+                <Box
+                  sx={{
+                    px: 2,
+                    py: 0.75,
+                    borderRadius: 2,
+                    background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+                    color: "#fff",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    "&:hover": { opacity: 0.9 },
+                    transition: "all 0.15s",
+                  }}
+                >
+                  S'inscrire
+                </Box>
+              </Link>
+            </Box>
+          )}
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
+
+Header.propTypes = {
+  onMenuClick: PropTypes.func,
+};
+Header.defaultProps = {
+  onMenuClick: () => {},
+};

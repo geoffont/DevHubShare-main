@@ -1,24 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { PropTypes } from "prop-types";
-import { styled } from "@mui/system";
 import { Link } from "react-router-dom";
-import {
-  Container,
-  Typography,
-  Stack,
-  Button,
-  useMediaQuery,
-} from "@mui/material";
+import { Box, Typography, Chip, Button } from "@mui/material";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
+import AddIcon from "@mui/icons-material/Add";
 import Post from "./Post";
 import SelectedLanguageContext from "../../services/context/SelectedLanguageContext";
-
-const Links = styled(Link)({
-  textDecoration: "none",
-  color: "#FFFFFF",
-  fontWeight: "bold",
-  fontSize: "small",
-});
 
 export default function FeedSelected() {
   const { selectedLanguage } = useContext(SelectedLanguageContext);
@@ -28,7 +15,6 @@ export default function FeedSelected() {
   const [userList, setUserList] = useState([]);
   const [newAnswerSubmitted, setNewAnswerSubmitted] = useState(false);
   const token = localStorage.getItem("token");
-  const isMobile = useMediaQuery("(max-width: 600px)");
 
   useEffect(() => {
     const getAnswerList = async () => {
@@ -37,7 +23,6 @@ export default function FeedSelected() {
       });
       setAnswerList(response.data);
     };
-
     const getUserList = async () => {
       const response = await axios.get("http://localhost:4000/users", {
         headers: { Authorization: `Bearer ${token}` },
@@ -58,150 +43,120 @@ export default function FeedSelected() {
     getLanguageList();
   }, []);
 
-  const getPostList = async () => {
-    const response = await axios.get("http://localhost:4000/posts", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setPostList(response.data);
-  };
   useEffect(() => {
+    const getPostList = async () => {
+      const response = await axios.get("http://localhost:4000/posts", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPostList(response.data);
+    };
     getPostList();
   }, [newAnswerSubmitted, answerList]);
 
   const languageFiltered = languageList.filter(
-    (language) => language.language_name === selectedLanguage
+    (l) => l.language_name === selectedLanguage
   );
-
   const postFiltered = postList.filter(
-    (post) => post.language_id === languageFiltered[0]?.id
+    (p) => p.language_id === languageFiltered[0]?.id
   );
 
-  const sortedPostList = postList.sort(
+  const sortedPostList = [...postList].sort(
+    (a, b) => new Date(b.creation_date) - new Date(a.creation_date)
+  );
+  const sortedPostFiltered = [...postFiltered].sort(
     (a, b) => new Date(b.creation_date) - new Date(a.creation_date)
   );
 
-  const sortedPostFiltered = postFiltered.sort(
-    (a, b) => new Date(b.creation_date) - new Date(a.creation_date)
-  );
+  const displayedPosts = selectedLanguage ? sortedPostFiltered : sortedPostList;
+
   return (
-    <Container
-      direction="column"
-      sx={{
-        maxWidth: "sm",
-        maxHeight: "sm",
-        width: "100%",
-        margin: "1%",
-      }}
-    >
-      <Stack marginTop="2%" alignItems="flex-end">
-        <Button
-          aria-label="Lien vers la page créer un post"
+    <Box sx={{ maxWidth: 680, mx: "auto", mt: 4 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+        <Box
           sx={{
-            width: isMobile ? "50%" : "15%",
-            fontSize: isMobile && "smaller",
-            marginBottom: "1%",
-            padding: 0.5,
-            backgroundColor: "#0088CE",
+            width: 38,
+            height: 38,
+            borderRadius: "10px",
+            backgroundColor: "#F0FDF4",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <Links to="/creer-post">CREER MON POST</Links>
-        </Button>
-      </Stack>
-      <Stack
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-        sx={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "#82BE00",
-          borderRadius: 2,
-        }}
-      >
-        <Stack
-          sx={{
-            flexDirection: isMobile && "row",
-            alignItems: isMobile && "center",
-            justifyContent: isMobile && "center",
-          }}
-        >
-          <Typography
-            variant="h5"
-            color="#FFFFFF"
-            fontWeight="bold"
-            sx={{ mt: 2 }}
+          <ForumOutlinedIcon sx={{ color: "#10B981", fontSize: 20 }} />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: "#0F172A" }}>
+          Fil de discussion
+        </Typography>
+        {selectedLanguage && (
+          <Chip
+            label={selectedLanguage}
+            size="small"
+            sx={{
+              backgroundColor: "#EEF2FF",
+              color: "#6366F1",
+              fontWeight: 600,
+              fontSize: 12,
+            }}
+          />
+        )}
+        <Box sx={{ ml: "auto" }}>
+          <Button
+            component={Link}
+            to="/creer-post"
+            variant="contained"
+            size="small"
+            startIcon={<AddIcon />}
+            sx={{ borderRadius: 2 }}
           >
-            <em>Fil de discussion </em>
-            {selectedLanguage && <span>{selectedLanguage}</span>}
-          </Typography>
-        </Stack>
+            Créer un post
+          </Button>
+        </Box>
+      </Box>
 
-        <Stack sx={{ width: "90%", paddingBottom: "4%" }}>
-          {selectedLanguage
-            ? sortedPostFiltered.map((postMap) => {
-                const user = userList.find(
-                  (userFind) => userFind.id === postMap.user_id
-                );
-                return (
-                  <Post
-                    key={postMap?.id}
-                    postId={postMap?.id}
-                    pseudo={user.pseudo}
-                    tag={postMap?.tag}
-                    post={postMap?.post_text}
-                    postDate={postMap?.creation_date}
-                    answers={answerList
-                      .filter((answer) => answer.post_id === postMap?.id)
-                      .map((answerMap) => ({
-                        textAnswer: answerMap.answer_text,
-                        dateAnswer: answerMap.creation_date,
-                        userAnswer: userList.find(
-                          (userFind) => userFind.id === answerMap.user_id
-                        ),
-                      }))}
-                    newAnswerSubmitted={newAnswerSubmitted}
-                    setNewAnswerSubmitted={setNewAnswerSubmitted}
-                  />
-                );
-              })
-            : sortedPostList.map((postMap) => {
-                const user = userList.find(
-                  (userFind) => userFind.id === postMap.user_id
-                );
-                return (
-                  <Post
-                    key={postMap?.id}
-                    postId={postMap?.id}
-                    pseudo={user.pseudo}
-                    tag={postMap?.tag}
-                    post={postMap?.post_text}
-                    postDate={postMap?.creation_date}
-                    answers={answerList
-                      .filter((answer) => answer.post_id === postMap?.id)
-                      .map((answerMap) => ({
-                        answerId: answerMap.id,
-                        textAnswer: answerMap.answer_text,
-                        dateAnswer: answerMap.creation_date,
-                        userAnswer: userList.find(
-                          (userFind) => userFind.id === answerMap.user_id
-                        ),
-                      }))}
-                    newAnswerSubmitted={newAnswerSubmitted}
-                    setNewAnswerSubmitted={setNewAnswerSubmitted}
-                  />
-                );
-              })}
-        </Stack>
-      </Stack>
-    </Container>
+      {displayedPosts.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 8,
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E2E8F0",
+            borderRadius: 3,
+          }}
+        >
+          <ForumOutlinedIcon sx={{ fontSize: 48, color: "#CBD5E1", mb: 2 }} />
+          <Typography sx={{ color: "#94A3B8", fontSize: 15 }}>
+            Aucun post pour le moment. Soyez le premier !
+          </Typography>
+        </Box>
+      ) : (
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          {displayedPosts.map((postMap) => {
+            const user = userList.find((u) => u.id === postMap.user_id);
+            if (!user) return null;
+            return (
+              <Post
+                key={postMap.id}
+                postId={postMap.id}
+                pseudo={user.pseudo}
+                tag={postMap.tag}
+                post={postMap.post_text}
+                postDate={postMap.creation_date}
+                answers={answerList
+                  .filter((a) => a.post_id === postMap.id)
+                  .map((a) => ({
+                    answerId: a.id,
+                    textAnswer: a.answer_text,
+                    dateAnswer: a.creation_date,
+                    userAnswer: userList.find((u) => u.id === a.user_id),
+                  }))}
+                newAnswerSubmitted={newAnswerSubmitted}
+                setNewAnswerSubmitted={setNewAnswerSubmitted}
+              />
+            );
+          })}
+        </Box>
+      )}
+    </Box>
   );
 }
-Post.propTypes = {
-  answerList: PropTypes.arrayOf(
-    PropTypes.shape({
-      textAnswer: PropTypes.string,
-      dateAnswer: PropTypes.string,
-      userAnswer: PropTypes.number,
-    })
-  ),
-};

@@ -2,28 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { styled } from "@mui/system";
 import {
-  Stack,
-  Container,
+  Box,
   Typography,
   Select,
   MenuItem,
   TextField,
   Button,
-  useMediaQuery,
+  Alert,
+  Chip,
 } from "@mui/material";
-
-const StyledButton = styled(Button)({
-  backgroundColor: "#FFFFFF",
-  color: "#009AA6",
-  "&:hover": { backgroundColor: "#FFFFFF" },
-  fontSize: 9,
-  fontWeight: "bold",
-  width: "10%",
-  alignSelf: "flex-end",
-  marginRight: "6%",
-});
+import AddIcon from "@mui/icons-material/Add";
 
 export default function CreatePost({
   languageNameSelected,
@@ -36,42 +25,25 @@ export default function CreatePost({
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
-  const isMobile = useMediaQuery("(max-width: 600px)");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getLanguages = () => {
-      axios
-        .get("http://localhost:4000/languages", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          setLanguages(response.data);
-        });
-    };
-    getLanguages();
+    axios
+      .get("http://localhost:4000/languages", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((r) => setLanguages(r.data))
+      .catch(() => {});
   }, []);
-
-  const handleLanguageChange = (event) => {
-    event.preventDefault();
-    setLanguageNameSelected(event.target.value);
-  };
-
-  const handleTagChange = (event) => {
-    setTag(event.target.value);
-  };
-
-  const handlePostChange = (event) => {
-    setPost(event.target.value);
-  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!languageNameSelected) {
-      setErrorSubmit("La sélection d'un langage est obligatoire *");
+      setErrorSubmit("La sélection d'un langage est obligatoire");
+      return;
     }
     const selectedLanguage = languages.find(
-      (language) => language.language_name === languageNameSelected
+      (l) => l.language_name === languageNameSelected
     );
     axios
       .post(
@@ -82,121 +54,135 @@ export default function CreatePost({
           tag,
           post_text: post,
         },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       )
-      .catch((error) => {
-        console.error(error);
-        navigate("/erreur400");
-      });
-    navigate("/mes-posts");
+      .then(() => navigate("/mes-posts"))
+      .catch(() => navigate("/erreur400"));
   };
 
   return (
-    <Container
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 1,
-        mt: 3,
-        minWidth: isMobile && "95vw",
-      }}
-    >
-      <Typography
-        variant="h4"
-        sx={{ textAlign: "center", color: "#009AA6", fontWeight: "medium" }}
-      >
-        <em>Créer un post</em>
-      </Typography>
-      <Stack
-        aria-label="form"
+    <Box sx={{ maxWidth: 680, mx: "auto", mb: 4 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+        <Box
+          sx={{
+            width: 38,
+            height: 38,
+            borderRadius: "10px",
+            background: "linear-gradient(135deg, #6366F1, #4F46E5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <AddIcon sx={{ color: "#fff", fontSize: 20 }} />
+        </Box>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: "#0F172A" }}>
+          Créer un post
+        </Typography>
+      </Box>
+
+      <Box
         component="form"
         onSubmit={handleSubmit}
         sx={{
-          mt: 2,
-          p: 2,
+          backgroundColor: "#FFFFFF",
+          border: "1px solid #E2E8F0",
+          borderRadius: 3,
+          p: { xs: 2.5, sm: 3 },
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 1,
-          borderRadius: 1,
-          boxShadow: "10px 10px 15px 2px #D7D7D7",
-          backgroundColor: "#009AA6",
-          width: "90%",
+          gap: 2.5,
         }}
       >
-        <Select
-          aria-label="select-language"
-          value={languageNameSelected}
-          onChange={handleLanguageChange}
-          displayEmpty
-          renderValue={(value) => value || "Sélectionner un langage *"}
-          size="small"
-          sx={{
-            backgroundColor: "#FFFFFF",
-            color: "#009AA6",
-            borderRadius: 1,
-            alignSelf: "center",
-            width: "80%",
-          }}
-        >
-          {languages.map((language) => (
-            <MenuItem
-              key={language.id}
-              value={language.language_name}
-              sx={{ color: "#009AA6" }}
-            >
-              {language.language_name}
-            </MenuItem>
-          ))}
-        </Select>
         {errorSubmit && (
-          <Typography
-            color="#333333"
-            variant="h7"
-            fontWeight="medium"
-            textAlign="center"
-          >
+          <Alert severity="warning" sx={{ borderRadius: 2 }}>
             {errorSubmit}
-          </Typography>
+          </Alert>
         )}
-        <TextField
-          aria-label="tag"
-          label="TAG"
-          value={tag}
-          onChange={handleTagChange}
-          required
-          size="small"
-          sx={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: 1,
-            alignSelf: "center",
-            width: "80%",
-          }}
-        />
-        <TextField
-          aria-label="post-content"
-          label="Votre Post"
-          value={post}
-          onChange={handlePostChange}
-          multiline
-          rows={7}
-          required
-          sx={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: 1,
-            width: "100%",
-          }}
-        />
-        <StyledButton type="submit">Poster</StyledButton>
-        <Typography variant="caption" alignSelf="flex-start" color="#FFFFFF">
-          Obligatoire *
-        </Typography>
-      </Stack>
-    </Container>
+
+        <Box>
+          <Typography
+            sx={{ fontSize: 13, fontWeight: 600, color: "#475569", mb: 1 }}
+          >
+            Langage <span style={{ color: "#EF4444" }}>*</span>
+          </Typography>
+          <Select
+            value={languageNameSelected}
+            onChange={(e) => {
+              setLanguageNameSelected(e.target.value);
+              setErrorSubmit("");
+            }}
+            displayEmpty
+            renderValue={(v) => v || "Sélectionner un langage..."}
+            size="small"
+            fullWidth
+            sx={{
+              backgroundColor: "#F8FAFC",
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#E2E8F0" },
+            }}
+          >
+            {languages.map((lang) => (
+              <MenuItem key={lang.id} value={lang.language_name}>
+                <Chip
+                  label={lang.language_name}
+                  size="small"
+                  sx={{
+                    backgroundColor: "#EEF2FF",
+                    color: "#6366F1",
+                    fontWeight: 600,
+                    fontSize: 12,
+                  }}
+                />
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+
+        <Box>
+          <Typography
+            sx={{ fontSize: 13, fontWeight: 600, color: "#475569", mb: 1 }}
+          >
+            Tag <span style={{ color: "#EF4444" }}>*</span>
+          </Typography>
+          <TextField
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            required
+            placeholder="Ex: bug, question, aide..."
+            size="small"
+            fullWidth
+          />
+        </Box>
+
+        <Box>
+          <Typography
+            sx={{ fontSize: 13, fontWeight: 600, color: "#475569", mb: 1 }}
+          >
+            Contenu du post <span style={{ color: "#EF4444" }}>*</span>
+          </Typography>
+          <TextField
+            value={post}
+            onChange={(e) => setPost(e.target.value)}
+            multiline
+            rows={7}
+            required
+            fullWidth
+            placeholder="Décrivez votre problème ou partagez vos connaissances..."
+          />
+        </Box>
+
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            sx={{ px: 4, borderRadius: 2.5 }}
+          >
+            Publier le post
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

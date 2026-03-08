@@ -1,92 +1,45 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable camelcase */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { makeStyles } from "@material-ui/core/styles";
 import {
+  Box,
   Grid,
-  Paper,
   TextField,
+  Typography,
   Button,
-  List,
-  Card,
-  CardContent,
-} from "@material-ui/core";
-import Typography from "@mui/material/Typography";
-import { FormControlLabel, Checkbox } from "@mui/material";
+  Chip,
+  Alert,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import UserImage from "../UserImage";
 import ModalSuppression from "./ModalSuppression";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    background: "#009aa3",
-    padding: theme.spacing(2.5),
-    marginBottom: theme.spacing(1),
-  },
-  field: {
-    background: "#FFF",
-    borderRadius: 5,
-    paddingLeft: 5,
-    marginBottom: theme.spacing(1),
-  },
-  valider: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-  },
-  texteLibreContainer: {
-    background: "#FFF",
-    borderRadius: 5,
-    marginBottom: theme.spacing(2),
-  },
-  card: {
-    background: "#82BE00",
-    marginBottom: theme.spacing(2),
-  },
-  gridCard: {
-    display: "grid",
-    alignItems: "center",
-  },
-}));
-
 function RegisteredInformations() {
-  const [currentUser, setCurrentUser] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
   const [userLanguages, setUserLanguages] = useState([]);
-  const [userUpdate, setUserUpdate] = useState([currentUser]);
-  const [pseudo, setPseudo] = useState([currentUser]);
-  const [firstname, setFirstname] = useState([currentUser]);
-  const [lastname, setLastname] = useState([currentUser]);
-  const [email, setEmail] = useState([currentUser]);
-  const [workplace, setWorkplace] = useState([currentUser]);
-  const [github, setGithub] = useState([currentUser]);
-  const [linkedin, setLinkedin] = useState([currentUser]);
-  const [userText, setUserText] = useState([currentUser]);
   const [sideLanguages, setSideLanguages] = useState([]);
-  const [language_id, setLanguageId] = useState([]);
-  const [selectedLanguage, setSelectedLanguage] = useState([]);
+  const [languageId, setLanguageId] = useState([]);
+  const [userUpdate, setUserUpdate] = useState({});
+  const [pseudo, setPseudo] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
+  const [workplace, setWorkplace] = useState("");
+  const [github, setGithub] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [userText, setUserText] = useState("");
+  const [saved, setSaved] = useState(false);
   const navigate = useNavigate();
-  const classes = useStyles();
 
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
 
-  const getLanguages = () => {
+  useEffect(() => {
     axios
       .get("http://localhost:4000/languages", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => response.data)
-      .then((data) => {
-        setSideLanguages(data);
-      });
-  };
-
-  useEffect(() => {
-    getLanguages();
+      .then((r) => setSideLanguages(r.data));
   }, []);
 
   useEffect(() => {
@@ -94,9 +47,7 @@ function RegisteredInformations() {
       .get(`http://localhost:4000/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        setCurrentUser(response.data);
-      });
+      .then((r) => setCurrentUser(r.data));
   }, []);
 
   useEffect(() => {
@@ -105,303 +56,259 @@ function RegisteredInformations() {
         .get(`http://localhost:4000/user_has_language/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
-        .then((response) => response.data)
-        .then((data) => {
-          const userLanguageObjects = data.map((lang) => ({
-            language_name: lang.language_name,
-          }));
-          setUserLanguages(userLanguageObjects);
-        });
+        .then((r) =>
+          setUserLanguages(
+            r.data.map((l) => ({ language_name: l.language_name }))
+          )
+        );
     }
   }, [currentUser]);
 
   const handleSaveChanges = (event) => {
     event.preventDefault();
-    navigate("/mon-compte");
-    const languageUpdate = {
-      language_id,
-    };
     axios
       .put(
         `http://localhost:4000/users/${userId}`,
-        { ...userUpdate, language_id, languageUpdate },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { ...userUpdate, languageId },
+        { headers: { Authorization: `Bearer ${token}` } }
       )
-      .then((response) => {
-        setUserUpdate([...userUpdate, response.data]);
-        setLanguageId([selectedLanguage]);
-        setSelectedLanguage("");
+      .then(() => {
+        setSaved(true);
+        setTimeout(() => {
+          setSaved(false);
+          navigate("/mon-compte");
+        }, 1000);
       });
   };
 
-  const handlePseudoChange = (event) => {
-    setPseudo(event.target.value);
-    setUserUpdate({ ...userUpdate, pseudo: event.target.value });
-  };
-  const handleFirstnameChange = (event) => {
-    setFirstname(event.target.value);
-    setUserUpdate({ ...userUpdate, firstname: event.target.value });
-  };
-  const handleLastnameChange = (event) => {
-    setLastname(event.target.value);
-    setUserUpdate({ ...userUpdate, lastname: event.target.value });
-  };
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-    setUserUpdate({ ...userUpdate, email: event.target.value });
-  };
-  const handleWorkplaceChange = (event) => {
-    setWorkplace(event.target.value);
-    setUserUpdate({ ...userUpdate, workplace: event.target.value });
-  };
-  const handleGithubChange = (event) => {
-    setGithub(event.target.value);
-    setUserUpdate({ ...userUpdate, github: event.target.value });
-  };
-  const handleLinkkedinChange = (event) => {
-    setLinkedin(event.target.value);
-    setUserUpdate({ ...userUpdate, linkedin: event.target.value });
-  };
-  const handleUserTextChange = (event) => {
-    setUserText(event.target.value);
-    setUserUpdate({ ...userUpdate, user_text: event.target.value });
-  };
   function handleLanguageChange(id) {
-    if (typeof id === "number") {
-      if (language_id.includes(id)) {
-        setLanguageId((prev) => prev.filter((languageId) => languageId !== id));
-      } else {
-        setLanguageId((prev) => [...prev, id]);
-      }
-    } else {
-      setLanguageId((prev) => prev);
-    }
+    setLanguageId((prev) =>
+      prev.includes(id) ? prev.filter((l) => l !== id) : [...prev, id]
+    );
   }
 
+  const makeHandler = (setter, key) => (e) => {
+    setter(e.target.value);
+    setUserUpdate((prev) => ({ ...prev, [key]: e.target.value }));
+  };
+
+  const fields = [
+    {
+      label: `Pseudo${currentUser.pseudo ? ` (${currentUser.pseudo})` : ""}`,
+      value: pseudo,
+      onChange: makeHandler(setPseudo, "pseudo"),
+      id: "pseudo",
+      required: true,
+    },
+    {
+      label: `Prénom${
+        currentUser.firstname ? ` (${currentUser.firstname})` : ""
+      }`,
+      value: firstname,
+      onChange: makeHandler(setFirstname, "firstname"),
+      id: "firstname",
+    },
+    {
+      label: `Nom${currentUser.lastname ? ` (${currentUser.lastname})` : ""}`,
+      value: lastname,
+      onChange: makeHandler(setLastname, "lastname"),
+      id: "lastname",
+    },
+    {
+      label: `Email${currentUser.email ? ` (${currentUser.email})` : ""}`,
+      value: email,
+      onChange: makeHandler(setEmail, "email"),
+      id: "email",
+      required: true,
+      type: "email",
+    },
+    {
+      label: `Poste actuel${
+        currentUser.workplace ? ` (${currentUser.workplace})` : ""
+      }`,
+      value: workplace,
+      onChange: makeHandler(setWorkplace, "workplace"),
+      id: "workplace",
+    },
+    {
+      label: `GitHub${currentUser.github ? ` (${currentUser.github})` : ""}`,
+      value: github,
+      onChange: makeHandler(setGithub, "github"),
+      id: "github",
+    },
+    {
+      label: `LinkedIn${
+        currentUser.linkedin ? ` (${currentUser.linkedin})` : ""
+      }`,
+      value: linkedin,
+      onChange: makeHandler(setLinkedin, "linkedin"),
+      id: "linkedin",
+    },
+  ];
+
   return (
-    <div>
-      <Grid container spacing={1}>
-        <Grid item xs={12} md={6}>
-          <Paper className={classes.root}>
-            <Button
-              variant="contained"
-              className={classes.retour}
-              href="/creer-post"
-            >
-              Retour
-            </Button>
-            <div className={classes.userImageContainer}>
-              <UserImage size="5rem" backgroundColor="grey" />
-            </div>
-            <form className={classes.root} noValidate autoComplete="off">
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Pseudo*${
-                      currentUser.pseudo ? ` (${currentUser.pseudo})` : ""
-                    }`}
-                    value={pseudo}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="pseudo"
-                    onChange={handlePseudoChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Prénom${
-                      currentUser.firstname ? ` (${currentUser.firstname})` : ""
-                    }`}
-                    value={firstname}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="firstname"
-                    onChange={handleFirstnameChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Nom${
-                      currentUser.lastname ? ` (${currentUser.lastname})` : ""
-                    }`}
-                    value={lastname}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="lastname"
-                    onChange={handleLastnameChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Email*${
-                      currentUser.email ? ` (${currentUser.email})` : ""
-                    }`}
-                    value={email}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="email"
-                    id="email"
-                    onChange={handleEmailChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Poste actuel${
-                      currentUser.workplace ? ` (${currentUser.workplace})` : ""
-                    }`}
-                    value={workplace}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="workplace"
-                    onChange={handleWorkplaceChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Github${
-                      currentUser.github ? ` (${currentUser.github})` : ""
-                    }`}
-                    value={github}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="github"
-                    onChange={handleGithubChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label={`Linkedin${
-                      currentUser.linkedin ? ` (${currentUser.linkedin})` : ""
-                    }`}
-                    value={linkedin}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="linkedin"
-                    onChange={handleLinkkedinChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label="Langages"
-                    value={userLanguages
-                      .map((lang) => lang.language_name)
-                      .join(", ")}
-                    fullWidth
-                    InputLabelProps={{
-                      shrink: true,
-                      disableAnimation: true,
-                      position: "top",
-                    }}
-                    type="text"
-                    id="langages"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Langages préférés*
-                  </Typography>
-                  {sideLanguages.map((language) => (
-                    <FormControlLabel
-                      key={language.id}
-                      control={
-                        <Checkbox
-                          checked={language_id.includes(language.id)}
-                          onChange={() => handleLanguageChange(language.id)}
-                          name={language.language_name}
-                        />
-                      }
-                      label={language.language_name}
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6}>
+        <Box
+          component="form"
+          onSubmit={handleSaveChanges}
+          sx={{
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E2E8F0",
+            borderRadius: 3,
+            p: 3,
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "#0F172A", mb: 2.5 }}
+          >
+            Modifier mes informations
+          </Typography>
+
+          {saved && (
+            <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+              Modifications enregistrées !
+            </Alert>
+          )}
+
+          <Grid container spacing={2}>
+            {fields.map((f) => (
+              <Grid item xs={12} key={f.id}>
+                <TextField
+                  label={f.label}
+                  value={f.value}
+                  onChange={f.onChange}
+                  fullWidth
+                  size="small"
+                  type={f.type || "text"}
+                  InputLabelProps={{ shrink: true }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#F8FAFC",
+                      "& fieldset": { borderColor: "#E2E8F0" },
+                      "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+                    },
+                  }}
+                />
+              </Grid>
+            ))}
+
+            {userLanguages.length > 0 && (
+              <Grid item xs={12}>
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "#475569",
+                    mb: 1,
+                  }}
+                >
+                  Langages actuels
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+                  {userLanguages.map((lang) => (
+                    <Chip
+                      key={lang.language_name}
+                      label={lang.language_name}
+                      size="small"
+                      sx={{
+                        backgroundColor: "#EEF2FF",
+                        color: "#6366F1",
+                        fontWeight: 600,
+                        fontSize: 11,
+                      }}
                     />
                   ))}
-                </Grid>
-                <Grid>
-                  <Button
-                    variant="contained"
-                    className={classes.valider}
-                    onClick={handleSaveChanges}
-                  >
-                    Valider
-                  </Button>
-                </Grid>
-                <Grid item xs={12}>
-                  *Champs obligatoire
-                </Grid>
+                </Box>
               </Grid>
-            </form>
-          </Paper>
-        </Grid>
+            )}
 
-        <Grid className={classes.gridCard} item xs={12} md={6}>
-          <Card className={classes.card}>
-            <CardContent>
-              <h3>Texte libre</h3>
-              <List>
-                <Grid item xs={12}>
-                  <TextField
-                    className={classes.field}
-                    label="Votre texte ici"
-                    value={currentUser.userText}
-                    multiline
-                    minRows={8}
-                    fullWidth
-                    type="text"
-                    id="texte libre"
-                    onChange={handleUserTextChange}
+            <Grid item xs={12}>
+              <Typography
+                sx={{ fontSize: 12, fontWeight: 600, color: "#475569", mb: 1 }}
+              >
+                Choisir mes langages préférés
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                {sideLanguages.map((language) => (
+                  <FormControlLabel
+                    key={language.id}
+                    control={
+                      <Checkbox
+                        checked={languageId.includes(language.id)}
+                        onChange={() => handleLanguageChange(language.id)}
+                        size="small"
+                        sx={{ "&.Mui-checked": { color: "#6366F1" } }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>
+                        {language.language_name}
+                      </Typography>
+                    }
                   />
-                </Grid>
-              </List>
-            </CardContent>
-          </Card>
-          <Grid item xs={12} className={classes.valider}>
-            <ModalSuppression />
+                ))}
+              </Box>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              sx={{ display: "flex", justifyContent: "flex-end" }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ borderRadius: 2 }}
+              >
+                Enregistrer
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography sx={{ fontSize: 11, color: "#94A3B8" }}>
+                * Champs obligatoires
+              </Typography>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Grid>
-    </div>
+
+      <Grid item xs={12} md={6}>
+        <Box
+          sx={{
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E2E8F0",
+            borderRadius: 3,
+            p: 3,
+          }}
+        >
+          <Typography
+            sx={{ fontSize: 12, fontWeight: 600, color: "#475569", mb: 1 }}
+          >
+            Texte libre
+          </Typography>
+          <TextField
+            label="Votre texte ici"
+            value={userText}
+            onChange={makeHandler(setUserText, "user_text")}
+            multiline
+            minRows={8}
+            fullWidth
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#F8FAFC",
+                "& fieldset": { borderColor: "#E2E8F0" },
+                "&.Mui-focused fieldset": { borderColor: "#6366F1" },
+              },
+            }}
+          />
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+            <ModalSuppression />
+          </Box>
+        </Box>
+      </Grid>
+    </Grid>
   );
 }
 

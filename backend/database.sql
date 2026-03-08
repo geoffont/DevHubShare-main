@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `post` (
   `language_id` INT NOT NULL,
   `user_id` INT NOT NULL,
   `creation_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`, `language_id`, `user_id`),
+  PRIMARY KEY (`id`),
   CONSTRAINT `fk_post_language1`
     FOREIGN KEY (`language_id`)
     REFERENCES `language` (`id`)
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `answer` (
   `post_id` INT NOT NULL,
   `user_id` INT NOT NULL,
   `creation_date` DATETIME DEFAULT CURRENT_TIMESTAMP,  
-  PRIMARY KEY (`id`, `post_id`, `user_id`),
+  PRIMARY KEY (`id`),
   CONSTRAINT `fk_answer_post1`
     FOREIGN KEY (`post_id`)
     REFERENCES `post` (`id`)
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `user_has_language` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL,
   `language_id` INT NOT NULL,
-  PRIMARY KEY (`id`, `user_id`, `language_id`),
+  PRIMARY KEY (`id`),
   CONSTRAINT `fk_user_has_language_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `user` (`id`)
